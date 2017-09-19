@@ -1,8 +1,6 @@
 ## Godel
 
-Application for demonstrating surface blending with ROS.
-
-Godel: Austrian logician and mathematician http://en.wikipedia.org/wiki/Kurt_G%C3%B6del
+Godelite is a minimal version of rosindustrial's [Godel](https://github.com/ros-industrial-consortium/godel) Scan-n-plan application.
 
 ### Installation
 
@@ -23,6 +21,18 @@ Godel: Austrian logician and mathematician http://en.wikipedia.org/wiki/Kurt_G%C
   ```
   catkin build
   ```
+### Things Godelite doesn't (will not) do
+- Setup a robot workcell and sensors
+- Have a GUI
+- Perform meshing
+- Perform path generation
+
+### Bring Your Own Services (BYOS)
+- Macro 3d sensor
+- Micro 3d sensor
+- moveit
+- Get Mesh service
+- Get Path service
 
 ### Applications
 

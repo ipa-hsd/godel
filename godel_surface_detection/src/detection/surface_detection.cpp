@@ -23,7 +23,6 @@
 #include <sensor_msgs/point_cloud_conversion.h>
 #include <tf/transform_datatypes.h>
 #include <utils/mesh_conversions.h>
-#include <swri_profiler/profiler.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/pcl_base.h>
 #include <pcl/filters/passthrough.h>
@@ -327,7 +326,6 @@ namespace godel_surface_detection
 
     bool SurfaceDetection::find_surfaces()
     {
-      SWRI_PROFILE("find-surfaces");
 
       // Reset members
       surface_clouds_.clear();
@@ -344,7 +342,6 @@ namespace godel_surface_detection
       SurfaceSegmentation SS(process_cloud_ptr_);
       region_colored_cloud_ptr_ = CloudRGB::Ptr(new CloudRGB());
       {
-        SWRI_PROFILE("segment-clouds");
         SS.computeSegments(region_colored_cloud_ptr_);
       }
       SS.getSurfaceClouds(surface_clouds_);
@@ -365,7 +362,6 @@ namespace godel_surface_detection
       }
 
       // Compute mesh from point clouds
-      SWRI_PROFILE("mesh-clouds");
       for (std::size_t i = 0; i < surface_clouds_.size(); i++)
       {
         pcl::PolygonMesh mesh;

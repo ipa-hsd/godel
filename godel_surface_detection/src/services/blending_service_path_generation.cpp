@@ -10,8 +10,6 @@
 #include <eigen_conversions/eigen_msg.h>
 #include <path_planning_plugins_base/path_planning_base.h>
 
-#include <swri_profiler/profiler.h>
-
 // Temporary constants for storing blending path `planning parameters
 // Will be replaced by loadable, savable parameters
 const static std::string BLEND_TRAJECTORY_BAGFILE = "blend_trajectory.bag";
@@ -129,7 +127,6 @@ inline static bool isScanPath(const std::string& name)
 bool SurfaceBlendingService::generateEdgePath(godel_surface_detection::detection::CloudRGB::Ptr surface,
                                               std::vector<geometry_msgs::PoseArray>& result)
 {
-  SWRI_PROFILE("gen-edge-path");
   // Send request to edge path generation service
   std::vector<pcl::IndicesPtr> sorted_boundaries;
 
@@ -202,7 +199,6 @@ static bool generateToolPaths(const godel_msgs::PathPlanningParameters& params,
 bool SurfaceBlendingService::generateBlendPath(const godel_msgs::PathPlanningParameters &params,
                                                const pcl::PolygonMesh &mesh, std::vector<geometry_msgs::PoseArray> &result)
 {
-  SWRI_PROFILE("gen-blend-path");
   try
   {
     if (!generateToolPaths(params, mesh, getBlendToolPlanningPluginName(), result))
@@ -222,7 +218,6 @@ bool SurfaceBlendingService::generateBlendPath(const godel_msgs::PathPlanningPar
 bool SurfaceBlendingService::generateScanPath(const godel_msgs::PathPlanningParameters &params, const pcl::PolygonMesh &mesh,
                                               std::vector<geometry_msgs::PoseArray> &result)
 {
-  SWRI_PROFILE("gen-scan-path");
   try
   {
     if (!generateToolPaths(params, mesh, getScanToolPlanningPluginName(), result))
@@ -246,7 +241,6 @@ SurfaceBlendingService::generateProcessPath(const int& id,
                                             godel_surface_detection::detection::CloudRGB::Ptr surface,
                                             ProcessPathResult& result)
 {
-  SWRI_PROFILE("tool-planning");
   std::vector<geometry_msgs::PoseArray> blend_result, edge_result, scan_result;
 
   // Step 1: Generate Blending Paths
@@ -319,7 +313,6 @@ SurfaceBlendingService::generateProcessPath(const int& id,
 godel_surface_detection::TrajectoryLibrary SurfaceBlendingService::generateMotionLibrary(
     const godel_msgs::PathPlanningParameters& params)
 {
-  SWRI_PROFILE("generate-motion-library");
   std::vector<int> selected_ids;
   surface_server_.getSelectedIds(selected_ids);
 
@@ -387,7 +380,6 @@ godel_surface_detection::TrajectoryLibrary SurfaceBlendingService::generateMotio
 
     // Generate trajectory plans from motion plan
     {
-      SWRI_PROFILE("motion-planning");
       for (std::size_t j = 0; j < paths.paths.size(); ++j)
       {
         ProcessPlanResult plan = generateProcessPlan(paths.paths[j].first, paths.paths[j].second, blend_params,
