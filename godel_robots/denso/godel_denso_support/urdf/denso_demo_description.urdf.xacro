@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="vs087" >
+  <xacro:include filename="$(find denso_robot_descriptions)/vs087_description/urdf/vs087_macro.urdf.xacro" />
+  <xacro:include filename="$(find godel_denso_support)/urdf/table_denso.urdf.xacro" />
+  <xacro:include filename="$(find godel_denso_support)/urdf/kinect.xacro"/>
+  <xacro:include filename="$(find blending_end_effector)/urdf/blending_eff_macro.xacro"/>
+  
+  <!--xacro:property name="sim" value="$(arg sim)"/-->
+
+	<link name="world_frame"/>
+
+	<!-- include platform -->
+	<xacro:table prefix="" parent="world_frame">
+  	  <origin xyz="-0.24 -0.78 -0.75" rpy="0 0 0"/>
+	</xacro:table>
+
+  	<!-- arm -->
+	<xacro:vs087 prefix="" parent="world_frame">
+ 	  <origin xyz="0 0 0" rpy="0 0 0" />
+    </xacro:vs087>
+    
+    <xacro:blending_eff_definition prefix=""/>
+    
+    <joint name="eff_joint" type="fixed">
+		<origin xyz="0 0 0" rpy="0 0 0" />
+		<parent link="link_6" />
+        <child link="eff_frame" />
+	</joint>
+
+	<!--xacro:if value="${sim}"-->
+	  <xacro:sensor_kinect parent="world_frame">
+	    <origin xyz="0.27 0.9 1.23" rpy="0 ${pi/2 - 15 * pi/180} ${-pi/2}"/>
+	  </xacro:sensor_kinect>
+	<!--/xacro:if-->
+
+	<!-- include camera -->
+	<!--xacro:unless value="${sim}">
+	  <link name="camera_link"/>
+	  <joint name="camera_joint" type="fixed">
+		<parent link="world"/>
+		<child link="camera_link"/>
+		<origin xyz="0.27 0.9 1.23" rpy="0 ${pi/2 - 15 * pi/180} ${-pi/2}"/>
+	  </joint>
+	</xacro:unless-->
+</robot>

@@ -1,0 +1,11 @@
+<launch>
+        <arg name="robot_name" default="vs087" />
+        <arg name="sim" default="false"/>
+        <arg name="urdf_file" default="$(find godel_denso_support)/urdf/denso_demo_description.urdf.xacro" />
+
+        <include file="$(find denso_moveit_config_pkg)/launch/moveit_planning_execution.launch">
+                <arg name="robot_name" value="$(arg robot_name)"/>
+                <arg name="sim" value="$(arg sim)"/>
+                <arg name="urdf_file" value="$(arg urdf_file)"/>
+        </include>
+</launch>

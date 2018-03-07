@@ -1,0 +1,10 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: godel_denso_support
+    relative_path: urdf/denso_demo_description.urdf.xacro
+  SRDF:
+    relative_path: config/vs087.srdf
+  CONFIG:
+    author_name: Harsh Deshpande
+    author_email: harshavardhan.deshpande@ipa.fraunhofer.de
+    generated_timestamp: 1520375398
