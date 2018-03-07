@@ -309,6 +309,7 @@ bool SurfaceBlendingService::run_robot_scan(visualization_msgs::MarkerArray& sur
 
   // publishing scan path preview
   robot_scan_.publish_scan_poses(ROBOT_SCAN_PATH_PREVIEW_TOPIC);
+  std::cout << "Robot scanning..." << std::endl;
 
   // clear all results
   surface_detection_.clear_results();
@@ -416,6 +417,7 @@ static bool isBlendPath(const std::string& s)
 bool SurfaceBlendingService::surface_detection_server_callback(
     godel_msgs::SurfaceDetection::Request& req, godel_msgs::SurfaceDetection::Response& res)
 {
+  std::cout << "received server detection call" << std::endl;
   switch (req.action)
   {
     case godel_msgs::SurfaceDetection::Request::INITIALIZE_SPACE:
@@ -444,6 +446,7 @@ bool SurfaceBlendingService::surface_detection_server_callback(
 
     case godel_msgs::SurfaceDetection::Request::SCAN_AND_FIND_ONLY:
     {
+      std::cout << "Scan and find only" << std::endl;
       res.surfaces_found = false;
       res.surfaces = visualization_msgs::MarkerArray();
       SurfaceBlendingService::clear_visualizations();

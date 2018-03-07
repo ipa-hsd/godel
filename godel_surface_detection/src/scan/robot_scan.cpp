@@ -188,6 +188,8 @@ int RobotScan::scan(bool move_only)
   scan_traj_poses_.clear();
   int poses_reached = 0;
   moveit_msgs::RobotTrajectory robot_traj;
+  std::cout << "Scan trajectory created? " << create_scan_trajectory(scan_traj_poses_, robot_traj) << std::endl;
+
   if (create_scan_trajectory(scan_traj_poses_, robot_traj))
   {
     std::vector<geometry_msgs::Pose> trajectory_poses;
@@ -220,7 +222,8 @@ int RobotScan::scan(bool move_only)
       state.setFromIK(rob_model->getJointModelGroup(params_.group_name), trajectory_poses[i], params_.tcp_frame);
       std::vector<double> to_goto (state.getVariablePositions(), state.getVariablePositions() + current_state.size());
       move_group_ptr_->setJointValueTarget(to_goto);
-//      move_group_ptr_->setPoseTarget(trajectory_poses[i], params_.tcp_frame);
+
+      //move_group_ptr_->setPoseTarget(trajectory_poses[i], params_.tcp_frame);
 
       moveit::planning_interface::MoveGroupInterface::Plan my_plan;
       bool success = static_cast<bool>(move_group_ptr_->plan(my_plan));

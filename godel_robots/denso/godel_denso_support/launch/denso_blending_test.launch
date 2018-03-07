@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- arguments -->
+  <arg name="sim_robot" default="true"/>
+  <arg name="robot_ip" unless="$(arg sim_robot)" />
+  <arg name="sim_laser" default="true"/>
+  <arg name="laser_ip" unless="$(arg sim_laser)" default="192.168.32.50"/>
+  <arg name="robot_model_plugin" default="descartes_moveit/IkFastMoveitStateAdapter"/>
+  <arg name="sim_sensor" default="true"/>
+  <arg name="real_pcd" default="false"/>
+  <arg name="pcd_location"/> <!-- path to pcd file of part -->
+  <arg name="pcd_frame" default="/base_link"/>
+  <arg name="debug_rviz" default="false"/>
+  <arg name="debug_core" default="false"/> <!--Brings up the surface blending service in debug mode-->
+  <arg name="save_data" default="false" />
+  <arg name="save_location" default="$(env HOME)/.ros/" />
+
+  <!-- Bring up simulated robot that can be visualized under the tf namespace 'simulation'
+       Allows for previewing paths generated before execution. -->
+  <include file="$(find industrial_robot_simulator_service)/launch/start_simulation_server.launch"/>
+
+  <!-- Brings up the core blending service: this includes the tool path planners
+       for both the blender and the laser scanner. -->
+  <include file="$(find godel_surface_detection)/launch/godel_core.launch">
+    <arg name="config_path" value="$(find godel_irb2400_support)/config"/>
+    <arg name="debug" value="$(arg debug_core)"/>
+    <arg name="save_data" value="$(arg save_data)" />
+    <arg name="save_location" value="$(arg save_location)" />
+  </include>
+
+  <!-- If the user specifies a 'fake' sensor, publish fake data clouds -->
+  <group if="$(arg sim_sensor)">
+    <group unless="$(arg real_pcd)">
+      <remap from="generated_cloud" to="sensor_point_cloud"/>
+      <node pkg="godel_surface_detection" type="point_cloud_generator_node" name="point_cloud_generator_node">
+        <rosparam command="load" file="$(find godel_irb2400_support)/config/point_cloud_descriptions.yaml"/>
+      </node>
+    </group>
+  </group>
+
+  <!-- rviz w/ specified configuration -->
+  <group unless="$(arg debug_rviz)">
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find godel_irb2400_support)/rviz/irb2400_blending.rviz" output="screen" launch-prefix="nice" required="true"/>
+  </group>
+
+  <!-- Bring up the MoveIt interface to the real or simulated robot -->
+  <include file="$(find denso_moveit_config_pkg)/launch/denso_moveit.launch">
+    <arg name="sim" value="$(arg sim_robot)"/>
+    <arg name="robot_ip" value="$(arg robot_ip)" unless="$(arg sim_robot)"/>
+  </include>
+
+  <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" output="screen">
+    <param name="publish_frequency" type="double" value="30.0" />
+    <rosparam param="/source_list"> [/vs087/joint_states] </rosparam>
+  </node>
+
+  <node pkg="tf" type="static_transform_publisher" name="ensenso_static_tf" args="0 0 0 0 1.57 0 kinect2_move_frame camera_optical_frame 100" />
+  <rosparam command="load" file="$(find meshing_plugins)/config/meshing.yaml" />
+  <rosparam command="load" file="$(find path_planning_plugins)/config/path_planning.yaml" />
+  <rosparam command="load" file="$(find godel_process_planning)/config/process_planning.yaml" />
+
+</launch>
