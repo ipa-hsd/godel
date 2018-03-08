@@ -188,6 +188,8 @@ int RobotScan::scan(bool move_only)
   scan_traj_poses_.clear();
   int poses_reached = 0;
   moveit_msgs::RobotTrajectory robot_traj;
+  std::cout << "Scan trajectory created? " << create_scan_trajectory(scan_traj_poses_, robot_traj) << std::endl;
+
   if (create_scan_trajectory(scan_traj_poses_, robot_traj))
   {
     std::vector<geometry_msgs::Pose> trajectory_poses;
@@ -213,17 +215,19 @@ int RobotScan::scan(bool move_only)
       // Todo: What follows is a hack to get saner motions for the automate demonstration
       // Can fail to plan because the solution is not checked for collisions/limits etc
       // though in practice it works pretty well.
-      auto current_state = move_group_ptr_->getCurrentJointValues();
+      /*auto current_state = move_group_ptr_->getCurrentJointValues();
       auto rob_model = move_group_ptr_->getRobotModel();
       moveit::core::RobotState state (rob_model);
       state.setVariablePositions(current_state);
       state.setFromIK(rob_model->getJointModelGroup(params_.group_name), trajectory_poses[i], params_.tcp_frame);
       std::vector<double> to_goto (state.getVariablePositions(), state.getVariablePositions() + current_state.size());
+      */
       //move_group_ptr_->setJointValueTarget(to_goto);
       move_group_ptr_->setPoseTarget(trajectory_poses[i], params_.tcp_frame);
 
       moveit::planning_interface::MoveGroupInterface::Plan my_plan;
       bool success = static_cast<bool>(move_group_ptr_->plan(my_plan));
+      std::cout << "path planned : " << success << std::endl;
 
       if (!success)
       {
@@ -339,9 +343,13 @@ bool RobotScan::create_scan_trajectory(std::vector<geometry_msgs::Pose>& scan_po
   geometry_msgs::Pose pose;
   double alpha;
   double alpha_incr = params_.num_scan_points == 1 ? 0.0 :
-      (params_.sweep_angle_end - params_.sweep_angle_start) / (params_.num_scan_points - 1);
+      (params_.sweep_angle_end - params_.sweep_angle_start) / (params_.num_scan_points);
   double eef_step = 4 * alpha_incr * params_.cam_to_obj_xoffset;
   double jump_threshold = 0.0f;
+
+  std::cout << alpha_incr << " " << params_.cam_to_obj_xoffset << " " << params_.cam_to_obj_zoffset << " " << params_.num_scan_points << std::endl;
+
+  double cam_tilt = M_PI_2 + atan2(params_.cam_to_obj_xoffset, params_.cam_to_obj_zoffset);
 
   // relative transforms
   tf::Transform xoffset_disp =
@@ -349,14 +357,29 @@ bool RobotScan::create_scan_trajectory(std::vector<geometry_msgs::Pose>& scan_po
   tf::Transform zoffset_disp =
       tf::Transform(tf::Quaternion::getIdentity(), tf::Vector3(0, 0, params_.cam_to_obj_zoffset));
   tf::Transform rot_alpha_about_z = tf::Transform::getIdentity();
-  tf::Transform rot_tilt_about_y =
-      tf::Transform(tf::Quaternion(tf::Vector3(0, 1, 0), params_.cam_tilt_angle));
+  tf::Transform rot_tilt_about_y = tf::Transform::getIdentity();
+  tf::Transform rot_eef_mod = tf::Transform::getIdentity();
+
   for (int i = 0; i < params_.num_scan_points; i++)
   {
     alpha = params_.sweep_angle_start + alpha_incr * i;
+
+    //To avoid robot's eff "facing itself", rotate Z-axis by 180° for the nearer half of the circle
+    int eef_mod = (alpha / M_PI > 0.5 && alpha / M_PI < 1.0) ? 1 : 0;
+
+    /*if(eef_mod) {
+      rot_eef_mod = tf::Transform(tf::Quaternion(tf::Vector3(0, 0, 1), -M_PI));
+      cam_tilt = M_PI_2 - atan2(params_.cam_to_obj_xoffset, params_.cam_to_obj_zoffset);
+    }*/
+    rot_tilt_about_y = tf::Transform(tf::Quaternion(tf::Vector3(0, 1, 0), cam_tilt));
+    //std::cout << "alpha : " << alpha << " " << eef_mod << std::endl;
+
     rot_alpha_about_z = tf::Transform(tf::Quaternion(tf::Vector3(0, 0, 1), alpha));
-    obj_to_cam_pose = zoffset_disp * rot_alpha_about_z * xoffset_disp * rot_tilt_about_y;
+    //obj_to_cam_pose = zoffset_disp * rot_alpha_about_z * xoffset_disp * rot_tilt_about_y;
+    obj_to_cam_pose = zoffset_disp * rot_alpha_about_z * xoffset_disp * rot_eef_mod * rot_tilt_about_y;
+    //obj_to_cam_pose = obj_to_cam_pose * rot_eef_mod;
     world_to_tcp = world_to_obj_tf * obj_to_cam_pose * tcp_to_cam_tf.inverse();
+
     tf::poseTFToMsg(world_to_tcp, pose);
     scan_poses.push_back(pose);
   }
