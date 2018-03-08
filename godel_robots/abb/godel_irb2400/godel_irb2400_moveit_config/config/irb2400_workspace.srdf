@@ -70,4 +70,6 @@
     <disable_collisions link1="link_4" link2="link_5" reason="Adjacent" />
     <disable_collisions link1="link_4" link2="link_6" reason="Default" />
     <disable_collisions link1="link_5" link2="link_6" reason="Adjacent" />
+    <disable_collisions link1="demo_cell_back_wall" link2="link_3" reason="default" />
+    <disable_collisions link1="demo_cell_back_wall" link2="link_2" reason="default" />
 </robot>
