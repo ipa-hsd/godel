@@ -28,7 +28,7 @@ robot_scan:
   cam_tilt_angle: 1.57
   sweep_angle_start: 0
   sweep_angle_end: 6.28
-  scan_topic: sensor_point_cloud
+  scan_topic: /ensenso/depth/points
   scan_target_frame: world_frame
   reachable_scan_points_ratio: 1.0
   stop_on_planning_error: true

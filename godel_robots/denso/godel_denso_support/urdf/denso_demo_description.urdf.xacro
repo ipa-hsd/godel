@@ -29,10 +29,10 @@
 	</joint>
 
 	<!--xacro:if value="${sim}"-->
-	  <xacro:sensor_kinect parent="world_frame">
+          <xacro:sensor_kinect parent="world_frame">
 	    <origin xyz="0.27 0.9 1.23" rpy="0 ${pi/2 - 15 * pi/180} ${-pi/2}"/>
 	  </xacro:sensor_kinect>
-	<!--/xacro:if-->
+        <!--/xacro:if-->
 
 	<!-- include camera -->
 	<!--xacro:unless value="${sim}">

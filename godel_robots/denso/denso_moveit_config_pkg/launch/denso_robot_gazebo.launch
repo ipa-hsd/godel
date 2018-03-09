@@ -10,6 +10,7 @@
   <arg name="robot_description" value="$(arg robot_name)_description" />
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find godel_denso_support)/worlds/denso_robot.world"/>
 	<arg name="paused" value="$(arg paused)"/>
   </include>
 
