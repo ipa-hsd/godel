@@ -15,6 +15,31 @@
   <arg name="save_data" default="false" />
   <arg name="save_location" default="$(env HOME)/.ros/" />
 
+    <!-- Brings up action interface for simple trajectory execution - used by laser scanner process execution -->
+    <node name="path_execution_service" pkg="godel_path_execution" type="path_execution_service_node"/>
+
+    <!-- Launches the blend/scan process planners: requires descartes plugin for the robot model -->
+    <include file="$(find godel_process_planning)/launch/process_planning.launch">
+      <arg name="robot_model_plugin" value="$(arg robot_model_plugin)"/>
+    </include>
+
+    <!-- Process execution nodes: These monitor the state of robot's execution of the planned path. They can be, and in this case are, robot or vendor specific -->
+    <group>
+      <remap from="simulate_path" to="simulation/simulate_trajectory"/>
+
+      <!-- Choose between 'execution' handlers based on whether we're connected to a real robot -->
+      <group if="$(arg sim_robot)">
+        <node name="blend_process_execution" pkg="godel_process_execution" type="blend_process_service_node"/>
+      </group>
+
+      <group unless="$(arg sim_robot)">
+        <!-- This requires connection to the service port of a physical robot controller -->
+        <node name="blend_process_execution" pkg="godel_process_execution" type="abb_blend_process_service_node"/>
+      </group>
+
+      <node name="scan_process_execution" pkg="godel_process_execution" type="keyence_process_service_node"/>
+    </group>
+
   <!-- Bring up simulated robot that can be visualized under the tf namespace 'simulation'
        Allows for previewing paths generated before execution. -->
   <include file="$(find industrial_robot_simulator_service)/launch/start_simulation_server.launch"/>
