@@ -24,14 +24,14 @@
     
     <link name="tool0"/>
     <joint name="tool0_joint" type="fixed">
-        <origin xyz="0 0 0" rpy="0 -${half_pi} 0" />
+        <origin xyz="0 0 0" rpy="0 3.142 0" />
         <parent link="link_6" />
         <child link="tool0" />
     </joint>
 
     <joint name="eff_joint" type="fixed">
-        <origin xyz="0 0 0" rpy="0 0 ${half_pi}" />
-        <parent link="tool0" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <parent link="link_6" />
         <child link="eff_frame" />
     </joint>
 
