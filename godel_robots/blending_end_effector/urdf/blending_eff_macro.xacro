@@ -78,10 +78,10 @@
 
     <link name="${prefix}blending_tool">
         <visual>
-            <!--origin xyz="0 0 0.1" rpy="0 0 0"/-->
+            <origin xyz="0 0 0.1" rpy="0 0 0"/>
             <geometry>
-                <mesh filename="package://blending_end_effector/meshes/visual/Blending_Tool.STL"/>
-                <!--cylinder length="0.05" radius="0.01"/-->
+                <!--mesh filename="package://blending_end_effector/meshes/visual/Blending_Tool.STL"/-->
+                <cylinder length="0.2" radius="0.01"/>
             </geometry>
             <material name="red">
                 <color rgba="1 0 0 1"/>
@@ -92,6 +92,12 @@
     <joint name="${prefix}bracket_to_blending_tool" type="fixed">
         <parent link="${prefix}bracket"/>
         <child link="${prefix}blending_tool"/>
+    </joint>
+
+    <joint name="${prefix}chuck_to_blend_tcp_frame" type="fixed">
+        <parent link="${prefix}blending_tool"/>
+        <child link="${prefix}tcp_frame"/>
+        <origin xyz="0 0 0.2" rpy="0 0 0"/>
     </joint>
 
     <link name="${prefix}ensenso">
@@ -136,11 +142,11 @@
         <origin xyz="${chuck_tcp_x} ${chuck_tcp_y} ${chuck_tcp_z}" rpy="0 -${half_pi} 0"/>
     </joint>
 
-    <joint name="${prefix}chuck_to_blend_tcp_frame" type="fixed">
+    <!--joint name="${prefix}chuck_to_blend_tcp_frame" type="fixed">
         <parent link="${prefix}chuck_tip_frame"/>
         <child link="${prefix}tcp_frame"/>
         <origin xyz="${blend_tcp_x} ${blend_tcp_y} ${blend_tcp_z}" rpy="0 0 0"/>
-    </joint>
+    </joint-->
 
     <!--Frames for the keyence profilometer-->
     <link name="${prefix}keyence_sensor_optical_frame"/>  <!--The emitter lens-->
