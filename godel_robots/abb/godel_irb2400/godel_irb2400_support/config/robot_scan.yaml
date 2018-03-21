@@ -32,4 +32,4 @@ robot_scan:
   scan_target_frame: world_frame
   reachable_scan_points_ratio: 1.0
   stop_on_planning_error: true
-  num_scan_points: 8
+  num_scan_points: 3

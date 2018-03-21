@@ -1,0 +1,1 @@
+rosrun moveit_kinematics create_ikfast_moveit_plugin.py vs087 manipulator vs087_ikfast_manipulator_plugin /home/hsd/scannplan_ws/src/godel/godel_robots/denso/vs087_ikfast_manipulator_plugin/src/vs087_manipulator_ikfast_solver.cpp

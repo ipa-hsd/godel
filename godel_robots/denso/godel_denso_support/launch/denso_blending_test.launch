@@ -5,7 +5,7 @@
   <arg name="robot_ip" unless="$(arg sim_robot)" />
   <arg name="sim_laser" default="true"/>
   <arg name="laser_ip" unless="$(arg sim_laser)" default="192.168.32.50"/>
-  <arg name="robot_model_plugin" default="descartes_moveit/MoveitStateAdapter"/>
+  <arg name="robot_model_plugin" default="descartes_moveit/IkFastMoveitStateAdapter"/>
   <arg name="sim_sensor" default="true"/>
   <arg name="real_pcd" default="false"/>
   <arg name="pcd_location"/> <!-- path to pcd file of part -->
