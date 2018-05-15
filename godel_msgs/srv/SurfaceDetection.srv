@@ -16,5 +16,5 @@ string name
 bool surfaces_found
 visualization_msgs/MarkerArray surfaces
 geometry_msgs/PoseArray robot_scan_poses
-godel_msgs/RobotScanParameters robot_scan										# parameter values used in latests results
+godel_msgs/RobotScanParameters robot_scan						# parameter values used in latests results
 godel_msgs/SurfaceDetectionParameters surface_detection			# parameter values used in latests results
