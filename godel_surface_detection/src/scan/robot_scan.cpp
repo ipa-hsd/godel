@@ -350,7 +350,7 @@ bool RobotScan::create_scan_trajectory(std::vector<geometry_msgs::Pose>& scan_po
   double eef_step = 4 * alpha_incr * params_.cam_to_obj_xoffset;
   double jump_threshold = 0.0f;
 
-  double cam_tilt = M_PI_2 + atan2(params_.cam_to_obj_xoffset, params_.cam_to_obj_zoffset);
+  //double cam_tilt = M_PI_2 + atan2(params_.cam_to_obj_xoffset, params_.cam_to_obj_zoffset);
 
   // relative transforms
   tf::Transform xoffset_disp =
@@ -359,7 +359,7 @@ bool RobotScan::create_scan_trajectory(std::vector<geometry_msgs::Pose>& scan_po
       tf::Transform(tf::Quaternion::getIdentity(), tf::Vector3(0, 0, params_.cam_to_obj_zoffset));
   tf::Transform rot_alpha_about_z = tf::Transform::getIdentity();
   tf::Transform rot_tilt_about_y =
-      tf::Transform(tf::Quaternion(tf::Vector3(0, 1, 0), cam_tilt));
+      tf::Transform(tf::Quaternion(tf::Vector3(0, 1, 0), params_.cam_tilt_angle));
   tf::Transform rot_alpha_x_world = 
       tf::Transform::getIdentity();
   for (int i = 0; i < params_.num_scan_points; i++)
