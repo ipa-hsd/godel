@@ -3,6 +3,7 @@
 #include <descartes_planner/dense_planner.h>
 #include <descartes_planner/sparse_planner.h>
 #include <descartes_trajectory/axial_symmetric_pt.h>
+#include <descartes_utilities/parameterization.h>
 
 #include <moveit/kinematic_constraints/utils.h>
 #include <moveit_msgs/GetMotionPlan.h>
@@ -156,7 +157,8 @@ godel_process_planning::toROSTrajectory(const godel_process_planning::DescartesT
 
     ros_trajectory.points.push_back(pt);
   }
-
+  descartes_utilities::setDerivatesFromSplines(ros_trajectory.points);
+  ROS_INFO_STREAM(ros_trajectory);
   return ros_trajectory;
 }
 

@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   descartes_moveit
   descartes_planner
   descartes_trajectory
+  descartes_utilities
   godel_msgs
   moveit_ros_planning_interface
   roscpp
@@ -20,6 +21,7 @@ catkin_package(
     descartes_moveit
     descartes_planner
     descartes_trajectory
+    descartes_utilities
     godel_msgs 
     moveit_ros_planning_interface 
     roscpp
