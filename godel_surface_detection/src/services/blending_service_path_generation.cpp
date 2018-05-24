@@ -269,50 +269,6 @@ SurfaceBlendingService::generateProcessPath(const int& id,
     data_coordinator_.setPoses(godel_surface_detection::data::PoseTypes::blend_pose, id, vt.second);
   }
 
-  // Step 2: Generate Laser Scan Paths
-  if (!generateScanPath(params, mesh, scan_result))
-  {
-    process_planning_feedback_.last_completed = "Failed to generate scan path for surface " + name;
-    process_planning_server_.publishFeedback(process_planning_feedback_);
-  }
-  else
-  {
-    process_planning_feedback_.last_completed = "Generated scan path for surface " + name;
-    process_planning_server_.publishFeedback(process_planning_feedback_);
-
-    // Add the successful scan path to the output
-    ProcessPathResult::value_type vt;
-    vt.first = name + "_scan";
-    vt.second = scan_result;
-    result.paths.push_back(vt);
-    data_coordinator_.setPoses(godel_surface_detection::data::PoseTypes::scan_pose, id, vt.second);
-  }
-
-  // Step 3: Generate Edge Paths for the given surface
-  if (!generateEdgePath(surface, edge_result))
-  {
-    process_planning_feedback_.last_completed = "Failed to generate generate edge path(s) for surface " + name;
-    process_planning_server_.publishFeedback(process_planning_feedback_);
-  }
-  else
-  {
-    process_planning_feedback_.last_completed = "Generated edge path(s) for surface " + name;
-    process_planning_server_.publishFeedback(process_planning_feedback_);
-
-    // Add the edge paths to the results
-    ProcessPathResult::value_type vt;
-    int i = 0;
-    for(const auto& pose_array : edge_result)
-    {
-      vt.first = name + "_edge_" + std::to_string(i++);
-      std::vector<geometry_msgs::PoseArray> temp;
-      temp.push_back(pose_array);
-      vt.second = std::move(temp);
-      result.paths.push_back(vt);
-      data_coordinator_.addEdge(id, vt.first, pose_array);
-    }
-  }
-
   return result.paths.size() > 0;
 }
 
