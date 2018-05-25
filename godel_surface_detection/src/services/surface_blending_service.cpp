@@ -725,6 +725,7 @@ void SurfaceBlendingService::selectMotionPlansActionCallback(const godel_msgs::S
   }
   else
   {
+    exe_client->cancelGoal();
     res.code=godel_msgs::SelectMotionPlanResult::TIMEOUT;
     select_motion_plan_server_.setAborted(res);
   }
