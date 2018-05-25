@@ -718,17 +718,18 @@ void SurfaceBlendingService::selectMotionPlansActionCallback(const godel_msgs::S
 
   ros::Duration process_time(goal.goal.trajectory_depart.points.back().time_from_start);
   ros::Duration buffer_time(PROCESS_EXE_BUFFER);
-  if(exe_client->waitForResult(process_time + buffer_time))
-  {
-    res.code = godel_msgs::SelectMotionPlanResult::SUCCESS;
-    select_motion_plan_server_.setSucceeded(res);
-  }
-  else
+  if(!exe_client->waitForResult(process_time + buffer_time))
   {
     exe_client->cancelGoal();
     res.code=godel_msgs::SelectMotionPlanResult::TIMEOUT;
-    select_motion_plan_server_.setAborted(res);
   }
+  else if(exe_client->getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+  {
+    res.code = godel_msgs::SelectMotionPlanResult::SUCCESS;
+    select_motion_plan_server_.setSucceeded(res);
+    return;
+  }
+  select_motion_plan_server_.setAborted(res);
 }
 
 
