@@ -592,8 +592,10 @@ void SurfaceBlendingService::processPlanningActionCallback(const godel_msgs::Pro
 
 
 bool SurfaceBlendingService::select_surface_server_callback(godel_msgs::SelectSurface::Request& req,
-                                                            godel_msgs::SelectSurface::Response&)
+                                                            godel_msgs::SelectSurface::Response& res)
 {
+  res.succeeded = true;
+
   switch (req.action)
   {
   case godel_msgs::SelectSurface::Request::SELECT:
@@ -630,6 +632,9 @@ bool SurfaceBlendingService::select_surface_server_callback(godel_msgs::SelectSu
   case godel_msgs::SelectSurface::Request::SHOW_ALL:
     surface_server_.show_all(true);
     break;
+
+  default:
+    res.succeeded = false;
   }
 
   return true;
