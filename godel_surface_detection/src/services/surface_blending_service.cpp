@@ -705,18 +705,21 @@ void SurfaceBlendingService::selectMotionPlansActionCallback(const godel_msgs::S
   bool is_blend = trajectory_library_.get()[goal_in->name].type == godel_msgs::ProcessPlan::BLEND_TYPE;
 
   // Send command to execution server
-  godel_msgs::ProcessExecutionActionGoal goal;
-  goal.goal.trajectory_approach = trajectory_library_.get()[goal_in->name].trajectory_approach;
-  goal.goal.trajectory_depart = trajectory_library_.get()[goal_in->name].trajectory_depart;
-  goal.goal.trajectory_process = trajectory_library_.get()[goal_in->name].trajectory_process;
-  goal.goal.wait_for_execution = goal_in->wait_for_execution;
-  goal.goal.simulate = goal_in->simulate;
+  godel_msgs::ProcessExecutionGoal goal;
+  goal.trajectory_approach = trajectory_library_.get()[goal_in->name].trajectory_approach;
+  goal.trajectory_depart = trajectory_library_.get()[goal_in->name].trajectory_depart;
+  goal.trajectory_process = trajectory_library_.get()[goal_in->name].trajectory_process;
+  goal.wait_for_execution = goal_in->wait_for_execution;
+  goal.simulate = goal_in->simulate;
 
   actionlib::SimpleActionClient<godel_msgs::ProcessExecutionAction> *exe_client =
       (is_blend ? &blend_exe_client_ : &scan_exe_client_);
-  exe_client->sendGoal(goal.goal);
+  exe_client->sendGoal(goal);
 
-  ros::Duration process_time(goal.goal.trajectory_depart.points.back().time_from_start);
+  ros::Duration process_time(goal.trajectory_approach.points.back().time_from_start
+                           + goal.trajectory_process.points.back().time_from_start
+                           + goal.trajectory_depart.points.back().time_from_start);
+
   ros::Duration buffer_time(PROCESS_EXE_BUFFER);
   if(!exe_client->waitForResult(process_time + buffer_time))
   {
