@@ -222,6 +222,7 @@ trajectory_msgs::JointTrajectory godel_process_planning::getMoveitPlan(
   req.motion_plan_request.group_name = group_name;
   req.motion_plan_request.num_planning_attempts = DEFAULT_MOVEIT_NUM_PLANNING_ATTEMPTS;
   req.motion_plan_request.max_velocity_scaling_factor = DEFAULT_MOVEIT_VELOCITY_SCALING;
+  req.motion_plan_request.max_acceleration_scaling_factor = 0.5;
   req.motion_plan_request.allowed_planning_time = DEFAULT_MOVEIT_PLANNING_TIME;
   req.motion_plan_request.planner_id = DEFAULT_MOVEIT_PLANNER_ID;
 
