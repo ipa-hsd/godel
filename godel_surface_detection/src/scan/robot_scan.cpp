@@ -26,6 +26,8 @@
 #include <moveit/trajectory_processing/iterative_time_parameterization.h>
 #include <godel_param_helpers/godel_param_helpers.h>
 
+#include <std_srvs/Trigger.h>
+
 static const std::string DEFAULT_MOVEIT_PLANNER = "RRTConnectkConfigDefault";
 
 static bool loadPoseParam(ros::NodeHandle& nh, const std::string& name, geometry_msgs::Pose& pose)
@@ -39,6 +41,53 @@ static bool loadPoseParam(ros::NodeHandle& nh, const std::string& name, geometry
          loadParam(nh, name + "/quat/z", pose.orientation.z) &&
          loadParam(nh, name + "/quat/w", pose.orientation.w);
 }
+
+class CloudSubscriber {
+  using Ptr = sensor_msgs::PointCloud2ConstPtr;
+  ros::NodeHandle nh_;
+  boost::condition_variable cond_;
+  boost::mutex mutex_;
+  sensor_msgs::PointCloud2ConstPtr cloud_;
+  ros::ServiceClient client_;
+  ros::Subscriber sub_;
+
+  void receive(const Ptr &c){
+    boost::mutex::scoped_lock lock(mutex_);
+    cloud_ = c;
+    cond_.notify_one();
+  }
+public:
+  CloudSubscriber(const std::string &name) {
+    client_ = nh_.serviceClient<std_srvs::Trigger>(name + "_request");
+    sub_ = nh_.subscribe(name, 1, &CloudSubscriber::receive, this);
+  }
+
+  sensor_msgs::PointCloud2ConstPtr getCloud(const ros::Duration &dur) {
+    boost::mutex::scoped_lock lock(mutex_);
+    cloud_.reset();
+    ros::Time now = ros::Time::now();
+    boost::chrono::steady_clock::time_point abs = boost::chrono::steady_clock::now() + boost::chrono::nanoseconds(dur.toNSec());
+
+    std_srvs::Trigger srv;
+    if(client_.exists()){
+      lock.unlock();
+      if(!client_.call(srv)) {
+        ROS_ERROR_STREAM("Could not call " << client_.getService());
+        return 0;
+      }
+      if(!srv.response.success) {
+        ROS_ERROR_STREAM(client_.getService() << " returned: " << srv.response.message);
+        return 0;
+      }
+      ROS_INFO_STREAM("Called " << client_.getService());
+      lock.lock();
+    }
+
+    cond_.wait_until(lock, abs, [this, now] { return cloud_ && cloud_->header.stamp > now; });
+    return cloud_;
+
+  }
+};
 
 namespace godel_surface_detection
 {
@@ -193,6 +242,8 @@ int RobotScan::scan(bool move_only)
   moveit_msgs::RobotTrajectory robot_traj;
   std::cout << "Scan trajectory created? " << create_scan_trajectory(scan_traj_poses_, robot_traj) << std::endl;
 
+  CloudSubscriber sub(params_.scan_topic);
+
   if (create_scan_trajectory(scan_traj_poses_, robot_traj))
   {
     std::vector<geometry_msgs::Pose> trajectory_poses;
@@ -268,8 +319,7 @@ int RobotScan::scan(bool move_only)
       {
         // get message
         ros::Duration(1.0).sleep();
-        sensor_msgs::PointCloud2ConstPtr msg = ros::topic::waitForMessage<sensor_msgs::PointCloud2>(
-            params_.scan_topic, ros::Duration(WAIT_MSG_DURATION));
+        sensor_msgs::PointCloud2ConstPtr msg = sub.getCloud(ros::Duration(WAIT_MSG_DURATION));
         pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
         tf::StampedTransform source_to_target_tf;
         if (msg)

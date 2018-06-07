@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   interactive_markers
   moveit_ros_move_group
   moveit_ros_planning_interface
+  std_srvs
   tf
   tf_conversions
   godel_process_path_generation
@@ -44,6 +45,7 @@ catkin_package(
     roscpp
     sensor_msgs
     interactive_markers
+    std_srvs
     tf
     tf_conversions
     godel_process_path_generation
