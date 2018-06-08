@@ -318,7 +318,7 @@ int RobotScan::scan(bool move_only)
       if (!move_only)
       {
         // get message
-        ros::Duration(1.0).sleep();
+        ros::Duration(0.2).sleep();
         sensor_msgs::PointCloud2ConstPtr msg = sub.getCloud(ros::Duration(WAIT_MSG_DURATION));
         pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
         tf::StampedTransform source_to_target_tf;
@@ -370,8 +370,6 @@ int RobotScan::scan(bool move_only)
       {
         ROS_WARN_STREAM("MOVE_ONLY mode, skipping scan");
       }
-
-      ros::Duration(0.5f).sleep();
     }
   }
 
