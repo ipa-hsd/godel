@@ -41,7 +41,11 @@ void godel_process_execution::BlendProcessService::executionCallback(
   {
     res.success = executeProcess(goal);
   }
-  process_exe_action_server_.setSucceeded(res);
+  if(res.success) {
+    process_exe_action_server_.setSucceeded(res);
+  }else{
+    process_exe_action_server_.setAborted(res);
+  }
 }
 
 bool godel_process_execution::BlendProcessService::executeProcess(
