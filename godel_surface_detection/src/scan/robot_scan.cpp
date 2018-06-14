@@ -108,6 +108,7 @@ RobotScan::RobotScan()
   params_.home_position = "home";
   params_.world_frame = "world_frame";
   params_.tcp_frame = "kinect2_move_frame";
+  params_.planner_id = DEFAULT_MOVEIT_PLANNER;
   tf::poseTFToMsg(tf::Transform::getIdentity(), params_.tcp_to_cam_pose);
   tf::poseTFToMsg(tf::Transform::getIdentity(), params_.world_to_obj_pose);
   params_.cam_to_obj_zoffset = 0;
@@ -129,7 +130,7 @@ bool RobotScan::init()
   move_group_ptr_->setEndEffectorLink(params_.tcp_frame);
   move_group_ptr_->setPoseReferenceFrame(params_.world_frame);
   move_group_ptr_->setPlanningTime(PLANNING_TIME);
-  move_group_ptr_->setPlannerId(DEFAULT_MOVEIT_PLANNER);
+  move_group_ptr_->setPlannerId(params_.planner_id);
   tf_listener_ptr_ = TransformListenerPtr(new tf::TransformListener());
   scan_traj_poses_.clear();
   callback_list_.clear();
@@ -163,6 +164,7 @@ bool RobotScan::load_parameters(const std::string& filename)
          loadParam(nh, "num_scan_points", params_.num_scan_points) &&
          loadParam(nh, "reachable_scan_points_ratio", params_.reachable_scan_points_ratio) &&
          loadParam(nh, "scan_target_frame", params_.scan_target_frame) &&
+         loadParam(nh, "planner_id", params_.planner_id) &&
          loadBoolParam(nh, "stop_on_planning_error", params_.stop_on_planning_error);
 }
 

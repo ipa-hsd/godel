@@ -4,6 +4,7 @@ float64 move_scan_vel_scaling
 string home_position
 string world_frame
 string tcp_frame
+string planner_id
 
 # trajectory generation
 geometry_msgs/Pose tcp_to_cam_pose
