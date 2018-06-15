@@ -242,7 +242,6 @@ int RobotScan::scan(bool move_only)
   scan_traj_poses_.clear();
   int poses_reached = 0;
   moveit_msgs::RobotTrajectory robot_traj;
-  std::cout << "Scan trajectory created? " << create_scan_trajectory(scan_traj_poses_, robot_traj) << std::endl;
 
   CloudSubscriber sub(params_.scan_topic);
 
