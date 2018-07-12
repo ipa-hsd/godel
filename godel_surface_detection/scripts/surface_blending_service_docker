@@ -1,0 +1,3 @@
+#!/bin/bash
+#exec docker run --rm --net=host -e ROS_NAMESPACE godel_modified_noether:latest rosrun godel_surface_detection surface_blending_service
+exec docker run -it --rm --net=host -e ROS_NAMESPACE godel_modified_noether:latest gdb -ex run /catkin_ws/devel/lib/godel_surface_detection/surface_blending_service
