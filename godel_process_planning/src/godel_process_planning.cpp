@@ -20,18 +20,6 @@ godel_process_planning::ProcessPlanningManager::ProcessPlanningManager(
     throw std::runtime_error("Unable to initialize blending robot model");
   }
 
-  // Attempt to load and initialize the scanning/keyence robot model
-  keyence_model_ = plugin_loader_.createInstance(robot_model_plugin);
-  if (!keyence_model_)
-  {
-    throw std::runtime_error(std::string("Could not load: ") + robot_model_plugin);
-  }
-
-  if (!keyence_model_->initialize("robot_description", keyence_group, world_frame, keyence_tcp))
-  {
-    throw std::runtime_error("Unable to initialize scanning robot model");
-  }
-
   // Load the moveit model
   robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
   moveit_model_ = robot_model_loader.getModel();
